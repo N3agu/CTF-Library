@@ -1,0 +1,20 @@
+[
+    {
+        "name": "SQL Injection Challenge",
+        "author": "CyberSecLearner",
+        "link": "https://example.com/sql-injection-writeup",
+        "description": "A simple SQL injection challenge where the goal was to bypass authentication.\n\nWe used manual SQL injection and automated tools.",
+        "tools": "Burp Suite, SQLMap, Manual SQL Injection",
+        "tags": ["Web", "SQL Injection", "Pentesting"],
+        "solve": "1. First, identify the vulnerable parameter.\n2. Use `' OR 1=1 --` to bypass authentication.\n3. Extract data using UNION-based injection.\n\nExample exploit:\n```\nSELECT * FROM users WHERE username = '' OR '1'='1' -- AND password = '';\n```"
+    },
+    {
+        "name": "Reverse Engineering CrackMe",
+        "author": "HackMaster42",
+        "link": "https://example.com/reverse-engineering-writeup",
+        "description": "A basic CrackMe challenge that required reversing a binary to find the correct password.",
+        "tools": "Ghidra, IDA Pro, x64dbg",
+        "tags": ["Reverse Engineering", "CrackMe", "Binary Analysis"],
+        "solve": "1. Load the binary into Ghidra.\n2. Identify the password comparison function.\n3. Extract the hardcoded password.\n\nDecompiled code snippet:\n```\nif (input == \"s3cr3tP@ss\") {\n    printf(\"Access Granted\\n\");\n} else {\n    printf(\"Access Denied\\n\");\n}\n```"
+    }
+]
