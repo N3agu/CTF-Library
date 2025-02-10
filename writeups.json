@@ -1,20 +1,119 @@
 [
     {
-        "name": "SQL Injection Challenge",
-        "author": "CyberSecLearner",
-        "link": "https://example.com/sql-injection-writeup",
-        "description": "A simple SQL injection challenge where the goal was to bypass authentication.\n\nWe used manual SQL injection and automated tools.",
-        "tools": "Burp Suite, SQLMap, Manual SQL Injection",
-        "tags": ["Web", "SQL Injection", "Pentesting"],
-        "solve": "1. First, identify the vulnerable parameter.\n2. Use `' OR 1=1 --` to bypass authentication.\n3. Extract data using UNION-based injection.\n\nExample exploit:\n```\nSELECT * FROM users WHERE username = '' OR '1'='1' -- AND password = '';\n```"
+        "name": "include-this",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "Try harder!",
+        "tools": "None",
+        "tags": ["Web", "LFI", "File Inclusion"],
+        "solve": "After visiting the webpage, I encounter a button that redirects me to a specific URL (ip:port/file=test.txt) and displays the content of the file upon clicking. This behavior suggests a potential vulnerability such as Local File Inclusion (LFI). {image1.png}\n\nTesting the “file” parameter for LFI, I attempted to modify the parameter value to “flag.txt,” which resulted in an error message. The error indicates that the current directory is /var/www/html/test. {image2.png}\n\nBy adjusting the parameter value to traverse four directories up and access “flag.txt”, I successfully retrieved the flag. {image3.png}"
     },
     {
-        "name": "Reverse Engineering CrackMe",
-        "author": "HackMaster42",
-        "link": "https://example.com/reverse-engineering-writeup",
-        "description": "A basic CrackMe challenge that required reversing a binary to find the correct password.",
-        "tools": "Ghidra, IDA Pro, x64dbg",
-        "tags": ["Reverse Engineering", "CrackMe", "Binary Analysis"],
-        "solve": "1. Load the binary into Ghidra.\n2. Identify the password comparison function.\n3. Extract the hardcoded password.\n\nDecompiled code snippet:\n```\nif (input == \"s3cr3tP@ss\") {\n    printf(\"Access Granted\\n\");\n} else {\n    printf(\"Access Denied\\n\");\n}\n```"
-    }
+        "name": "rubies",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "If you like jewelry you will be okay",
+        "tools": "Base64 Decoder, Google, CVE-2019-5418 Exploit",
+        "tags": ["Web", "Ruby on Rails", "CVE-2019-5418", "Exploit"],
+        "solve": "After starting the service, I decoded the page name from base64, revealing “rails”. I saw a large Ruby logo in the middle of the page. After looking up the terms on Google, I found that Ruby on Rails is a server-side web application framework written in Ruby. The image had a link (href attribute) that redirected to /vuln. I found information about a possible vulnerability CVE-2019-5418 (POC) online and started testing. {image4.png}\n\nThe flag was located in /home/gem/flag.txt:\n\nCTF{c5547baa6ce135850b3a728d442925f1ae63f2bf22301676282958a0ce5fae59}"
+    },
+    {
+        "name": "dumb-discord",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "none",
+        "tools": "Discord, Uncompyle6",
+        "tags": ["Code Review", "Cryptography"],
+        "solve": "After downloading \"server.cpython-36.pyc\", I used uncompyle6 to decompile it into Python code. I saw that the function called \"obfuscate\" was XORing the bytes it received as a parameter with the key \"ctf{tryharderdontstring}\", so I used the exact same function to decrypt all the strings.\n\n```from discord.ext import commands\nimport discord, json\nfrom discord.utils import get\n\ndef obfuscate(byt):\n    mask = b'ctf{tryharderdontstring}'\n    lmask = len(mask)\n    return bytes(c ^ mask[i % lmask] for i, c in enumerate(byt))\n\ndef test(s):\n    data = obfuscate(s.encode())\n    return data\n\nintents = discord.Intents.default()\nintents.members = True\ncfg = open(\"config.json\", \"r\")\ntmpconfig = cfg.read()\ncfg.close()\nconfig = json.loads(tmpconfig)\ntoken = config[\"token\"]\nclient = commands.Bot(command_prefix=\"/\")\n\n@client.event\nasync def on_ready():\n    print(\"Connected to bot: {}\".format(client.user.name))\n    print(\"Bot ID: {}\".format(client.user.id))\n\n@client.command()\nasync def getflag(ctx):\n    await ctx.send(\"pong\")\n\n@client.event\nasync def on_message(message):\n    await client.process_commands(message)\n    if \"!ping\" in message.content.lower():\n        await message.channel.send(\"pong\")\n    if \"/getflag\" in message.content.lower():\n        if message.author.id == 783473293554352141:\n            role = discord.utils.get((message.author.guild.roles), name=(\"dctf2020.cyberedu.ro\"))\n            member = discord.utils.get((message.author.guild.members), id=(message.author.id))\n            if role in member.roles:\n                await message.channel.send(test(config[\"flag\"]))\n    if \"/help\" in message.content.lower():\n        await message.channel.send(\"Try harder!\")\n    if \"/s基ay\" in message.content.lower():\n        await message.channel.send(message.content.replace(\"/s基ay\", \"\").replace(\"/getflag\", \"\"))\n\nclient.run(token)\n```\nI found the bot ID, so I used this link to invite it to my server. Then, I created the role \"dctf2020.cyberedu.ro\" that the bot checked for. I played around with the commands and discovered that using \"@DCTFTargetWhyNot /s基ay /getFlag\" doesn’t get filtered and gives you back.\n```b'\\x00\\x00\\x00\\x00E\\x10A\\x0e\\x00E\\x02VA\\x00\\x0eXC\\x17\\x12\\x17\\x0b_\\x03H\\x05C_CAB\\x1d\\x0b\\x07CWSAT\\r[AEG\\x17PVRKU\\x16\\x00L\\x16EOZYC\\x00QB]\\x0bYFK\\x17D\\x14'```After using the same function on the encrypted text, it gave me the flag: ctf{1b8fa7f33da67dfeb1d5f79850dcf13630b5563e98566bf7b76281d409d728c6}"
+    },
+    {
+        "name": "siem-logs",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "We need your investigation skills on the siem2* Kibana index. The attack occurred in 2018, it is recommended to set your timeline prior to this year.",
+        "tools": "Kibana, Elasticsearch",
+        "tags": ["SIEM", "Log Analysis", "Incident Response", "Forensics"],
+        "solve": "I accessed Kibana and navigated to the “Discover” section. Following the challenge description, I changed the index pattern to siem-logs2*. Based on the second question, I searched for the keyword “student”. This search revealed the following details: the IP address 103.53.43.239, the malicious domain name studentvisaconsultantsdelhi, and the CMS used: WordPress."
+    },
+    {
+        "name": "tsunami-researcher",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "Steve Kobbs is a specialist in meteorology. He was called to offer his expertise on the last tsunami which took place in our country. While Steve was working, a mysterious package arrived at the door. Inside, a USB stick was found, containing the following audio file: rain.wav. \n\nFlag format: The correct answer is in plaintext and must be sent to players in the form of `ctf{sha256 of plaintext word}`. \n\nGoal: Use various techniques to analyze audio files in order to recover the flag hidden in `rain.wav`.",
+        "tags": ["Forensics", "Audio Analysis", "Spectrogram", "Steganography"],
+        "tools": "Audacity, Sonic Visualizer, Spectrogram Analysis",
+        "solve": "I opened the file in Audacity and switched the view mode to Spectrogram. After adjusting the window size to get a clearer view, I was able to read the hidden message: 'Secret Code: Spectrogram'. \n\nThe flag turned out to be:\n\n`CTF{sha256(spectrogram)}`\n\nFinal flag:\n\n`CTF{cc3a329919391e291f0a41b7afd3877546f70813f0c06a8454912e0a92099369}`"
+    },
+    {
+        "name": "solve-this",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "Poți te rog să rezolvi acest exercițiu pentru mine?",
+        "solve": "I used CoCalc to decrypt the message. The Sage code used to solve the problem:\n\n```n = 3542351939701992275231003142553\na = 126512569275071152686821540801\nb = 3415839370426921122544181601752\n\nE = EllipticCurve(GF(n), [a, b])\nP = E(2631211060304008450389410782950, 1597897356677072100955051755088)\nQ = E(1249902752727911034264929949680, 3043929197938243211289309561776)\n\nx = Q.log(P)\n\nprint(f\"x: {x}\")```\nI found that x was `588581747331` and submitted the flag:\n\n`flag{sha256(588581747331)}`\n\nFinal flag:\n\n`flag{b2a3253556aeb3bb0f1782c083e90b6de968688d3f435863b82597e6f5efe4c0}`",
+        "tools": "SageMath, CoCalc, Elliptic Curve Cryptography",
+        "tags": ["Cryptography", "Elliptic Curves", "SageMath", "Math"]
+    },
+    {
+        "name": "unconditional",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "All the information you need is in the attachment file.",
+        "solve": "I decompiled the binary (ELF 32-bit) in IDA and obtained the following snippet of code:\n\n```v9 = *argv;\nif ((*argv)[28] == 114 && v9[10] + v9[20] == 156 && v9[36] + v9[7] == 142 && v9[23] + v9[42] == 146 && v9[10] >> 1 == 55 && v9[22] == 101 && *v9 == 67 && (v9[31] ^ 0xA) == v9[22] && v9[40] == 45 && v9[3] - v9[2] == 53 && v9[4] << 7 == 11392 && 2 * v9[3] == 246 && ...\n```\n\nBy reversing the operations in the conditions, I reconstructed the correct input string:\n\n`CTF{You-know-you-got-me-after-you-sha256-me}`\n\nHashing it with SHA-256 produced the flag:\n\n`CTF{e60100e9b047ca672947fdae0f114b3b052d33955c81b6df767843a4ffde439e}`",
+        "tools": "IDA Pro, Reverse Engineering, SHA-256",
+        "tags": ["Reverse Engineering", "Binary Analysis", "Cryptography", "IDA Pro"]
+    },
+    {
+        "name": "cross-or-zero",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "Can you find the key and the flag? I bet. It is not an encryption. It is ZERO.",
+        "solve": "I analyzed the challenge statement and noted the hint: 'It is not an encryption. It is ZERO.' This suggested that the key might be a sequence of zeros. I then wrote a Python script to reverse the XOR operation using the guessed key '0000'.\n\n```python\nimport base64\n\ndef string_xor(s, key):\n    key = (key * (len(s) // len(key) + 1))[:len(s)]\n    return ''.join(chr(ord(x) ^ ord(y)) for (x, y) in zip(s, key))\n\nencrypted_flag = \"dHNkdktTAVUHAABUA1VWVgIHBAlSBAFTBAMFUwECAgcAAAFWAFUFCFMACFFUAwQAVgBSBwQJBVZTAFYGCQYHVQABB1IJTQ==\"\ndecoded_bytes = base64.b64decode(encrypted_flag)\n\ndecoded_string = decoded_bytes.decode('latin1')\n\nkey_guess = \"0000\"  # Guessed key\nflag = string_xor(decoded_string, key_guess)\n\nprint(f\"Flag: {flag}\")\n```\n\nAfter executing the script, I successfully retrieved the flag.",
+        "tools": "Python, Base64, XOR",
+        "tags": ["Cryptography", "XOR", "Base64", "Reverse Engineering"]
+    },
+    {
+        "name": "linux-recovery",
+        "author": "N3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "Recover the flag from the Linux system logs. Reverse engineering is not a solution.",
+        "solve": "The challenge provides two files: a UPX-packed executable called 'chess' and a password-protected .rar archive. Running the 'chess' executable starts a tic-tac-toe game in the terminal. Winning the game by playing in the positions 1, 8, 3, 5, and 2 displays the message: 'Congrats, the secret message is 347774197377.' Additionally, it provides a note: 'VIC, you should like straddles and checkerboards: KCSLQMYOPHTZUBVAFJXGERIWDNSS 3 7.'\n\nRecognizing the VIC cipher, I used '347774197377' as the cipher key, 'KCSLQMYOPHTZUBVAFJXGERIWDNSS' as the alphabet, and 3 & 7 as the spare positions. This resulted in the password 'unicorn.'\n\nEntering 'unicorn' as the secret message returned '$sdfg3e4', which turned out to be the password for the .rar archive. Extracting the .rar file with this password revealed 'logs.txt'. Running:\n\n```bash\nstrings logs.txt | grep -i \"ctf\"\n```\n\nyielded the final flag: `CTF{socskc-343fs-fefewvsw}`.",
+        "tools": "Linux, UPX, VIC Cipher, Strings, grep",
+        "tags": ["Forensics", "Cryptography", "Linux", "Logs"]
+    },
+    {
+        "name": "this-file-hides-something",
+        "author": "n3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "There is an emergency regarding this file. We need to extract the password ASAP. It’s a crash dump, but our tools are not working. Please help us, time is not on our side.",
+        "solve": "After extracting the zip file, I obtained 'crashdump.elf'. From the description, I inferred that I needed to find a password within the crash dump and that the flag format was non-standard.\n\nI used Volatility to extract the LSA secrets with the following command:\n\n```bash\nvol -f crashdump.elf windows.lsadump.Lsadump\n```\n\nThis revealed the flag: `Str0ngAsAR0ck!`.",
+        "tools": "Volatility, Memory Forensics",
+        "tags": ["Forensics", "Memory Analysis", "Volatility", "Crash Dump"]
+    },
+    {
+        "name": "spy-agency",
+        "author": "n3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "A malicious application was sent to our target, who managed to have it before we confiscated the PC. Can you manage to obtain the secret message?",
+        "solve": "After extracting the zip file, I obtained 'crashdump.elf'. From the description, I inferred that I needed to search for an application within the crash dump and that the flag format was `ctf{sha256(location name from coordinates in lowercase)}`.\n\nI ran a filescan using Volatility:\n\n```bash\nvol -f spyagency3.bin windows.filescan.FileScan\n```\n\nThis revealed an interesting file called `app-release.apk.zip` at offset `0x3fefb8c0`. I extracted it using:\n\n```bash\nvol -f spyagency3.bin windows.dumpfiles.DumpFiles --physaddr 0x3fefb8c0\n```\n\nAfter unzipping the archive, I found:\n\n```\napp-release.apk/app-release/res/drawable/coordinates_can_be_found_here.jpg\n```\n\nUsing ExifTool to analyze the image:\n\n```bash\nexiftool coordinates_can_be_found_here.jpg\n```\n\nI extracted the coordinates: `44.44672703736637, 26.098652847616506`. Pasting them into Google Maps revealed the location: **Pizza Hut**.\n\nThe flag was obtained by hashing `pizzahut` with SHA-256:\n\n```\nctf{a939311a5c5be93e7a93d907ac4c22adb23ce45c39b8bfe2a26fb0d493521c4f}\n```",
+        "tools": "Volatility, ExifTool, Google Maps, SHA-256",
+        "tags": ["Forensics", "Memory Analysis", "Volatility", "ExifTool", "OSINT"]
+    },
+    {
+        "name": "access-vip-only",
+        "author": "n3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "We have a malicious employee who attempts to make other people join a secret club. The main message is 'come join us, we have a lot of money.' All we know is that he managed to look at something over the internet.",
+        "solve": "After extracting the archive, I obtained `access-only-vip.bin`, a memory dump. I used Volatility to scan for files:\n\n```bash\nvol -f access-only-vip.bin windows.filescan.FileScan\n```\n\nSince the description mentioned that the 'malicious employee' looked at something online, I decided to dump the browser history with:\n\n```bash\nvol -f access-only-vip.bin windows.dumpfiles.DumpFiles --physaddr 0x7dc4f570\n```\n\nSearching through the history, I found two interesting links:\n\n- https://pastebin.pl/view/29088365\n- https://pastebin.pl/view/9c63cf9c\n\nBoth contained the password: `poiuytrewq`.\n\nLooking again through the file scan, I found `flag.rar` and dumped it using:\n\n```bash\nvol -f access-only-vip.bin windows.dumpfiles.DumpFiles --physaddr 0x7ee72200\n```\n\nI then renamed and extracted it:\n\n```bash\nmv file.0x7ee72200.0xfa8001c6ac90.DataSectionObject.flag.ra.dat flag.rar\nunrar x flag.rar\n```\n\nUsing the password `poiuytrewq`, I extracted `win.txt`, which contained the following hash:\n\n```\nB8FA9EFBC8C8F043AFCA1B60F8F4C5245C54B5FF5BFB0603A71071F66C1EF295\n```\n\nThus, the flag was:\n\n```\nCTF{B8FA9EFBC8C8F043AFCA1B60F8F4C5245C54B5FF5BFB0603A71071F66C1EF295}\n```",
+        "tools": "Volatility, UnRAR, Pastebin",
+        "tags": ["Forensics", "Memory Analysis", "Volatility", "Browser Forensics", "OSINT"]
+    },
+    {
+        "name": "alternating",
+        "author": "n3agu",
+        "link": "https://n3agu.github.io/posts/ctf-writeups/",
+        "description": "We have hidden something in the file, and I’m sure you won’t find it. Make sure to extract the archive using WinRAR. Windows is your friend.",
+        "solve": "After extracting the file, I noticed the hint: 'Windows is your friend.' This suggested that the challenge involved a Windows-specific feature. I suspected the use of NTFS Alternate Data Streams (ADS) and listed them using:\n\n```cmd\ndir /r\n```\n\nThis revealed a hidden stream attached to `Flag.txt.txt`. To extract the flag, I used:\n\n```cmd\nmore < Flag.txt.txt:real_flag.txt:$DATA\n```\n\nThis revealed the flag:\n\n```\nctf{7ce5567830a2f9f8ce8a7e39856adfe5208242f6bce01ca9af1a230637d65a2d}\n```",
+        "tools": "NTFS Alternate Data Streams (ADS), Command Prompt, WinRAR",
+        "tags": ["Forensics", "Windows", "NTFS", "Alternate Data Streams", "File System Analysis"]
+    }            
 ]

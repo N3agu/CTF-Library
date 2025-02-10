@@ -161,12 +161,14 @@
                 solveElement.classList.add('solve');
 
                 const description = solve.description.replace(/\n/g, "<br>");
-                const solveSteps = solve.solve.replace(/\n/g, "<br>").replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+                let solveSteps = solve.solve.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                                        .replace(/\{([^{}]+\.(?:png|jpg))\}/gi, '<img src="images/$1" alt="$1" style="max-width:100%; border-radius: 5px;">')
+                                        .replace(/\n/g, "<br>");
 
                 solveElement.innerHTML = `<h2>${solve.name}</h2>
                                         <div class="solve-content">
                                             <p><strong>Author:</strong> ${solve.author}</p>
-                                            <p><a href="${solve.link}" target="_blank">Link to writeup</a></p>
+                                            <p><strong>Official link: </strong><a href="${solve.link}" target="_blank">Click here</a></p>
                                             <p><strong>Description:</strong> ${description}</p>
                                             <p><strong>Tools used:</strong> ${solve.tools}</p>
                                             <p><strong>Tags:</strong> ${solve.tags.join(', ')}</p>
