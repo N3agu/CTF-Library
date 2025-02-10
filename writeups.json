@@ -115,5 +115,23 @@
         "solve": "After extracting the file, I noticed the hint: 'Windows is your friend.' This suggested that the challenge involved a Windows-specific feature. I suspected the use of NTFS Alternate Data Streams (ADS) and listed them using:\n\n```cmd\ndir /r\n```\n\nThis revealed a hidden stream attached to `Flag.txt.txt`. To extract the flag, I used:\n\n```cmd\nmore < Flag.txt.txt:real_flag.txt:$DATA\n```\n\nThis revealed the flag:\n\n```\nctf{7ce5567830a2f9f8ce8a7e39856adfe5208242f6bce01ca9af1a230637d65a2d}\n```",
         "tools": "NTFS Alternate Data Streams (ADS), Command Prompt, WinRAR",
         "tags": ["Forensics", "Windows", "NTFS", "Alternate Data Streams", "File System Analysis"]
-    }            
+    },
+    {
+        "name": "Noogle",
+        "author": "offw0rld",
+        "link": "https://0x90r00t.com/2024/09/30/defcamp-quals-2024-web-noogle-write-up/",
+        "description": "Last week I decided to create my own search engine. It was kinda hard, so I piggybacked on another one. I also tried something on port 8000.",
+        "solve": "The challenge presents a search engine interface similar to Google. Upon using it, we get a list of search results. However, our goal is to access something on `localhost:3000`, which is blocked from direct access.\n\nAnalyzing the requests, we find that searches are processed through a backend API that accepts a single parameter:\n\n```\nurl=https://www.google.com/...\n```\n\nThis restriction prevents us from accessing arbitrary URLs. However, after researching, we discovered that Google’s `ved` parameter allows open redirection.\n\nExploitation Steps:\n1. Perform a Google search for our controlled URL and extract the `ved` parameter from the resulting links.\n2. Construct a search request to the challenge API using Google’s open redirect feature:\n\n```\nhttps://www.google.com/?url=...&ved=...\n```\n\n3. Use this technique to redirect to `localhost:3000`, bypassing restrictions and retrieving the flag:\n\n```\nCTF{9cf16d163cbaecc592ca40bee3de4b1626ee0f4a3b3db23cbd5ad921049ebc0f}\n```",
+        "tools": "Google Search, Open Redirect, Web Exploitation",
+        "tags": ["Web", "Open Redirect", "Google", "API Exploitation", "SSRF"]
+    },
+    {
+        "name": "production-bay",
+        "author": "winw",
+        "link": "https://0x90r00t.com/2024/09/30/defcamp-quals-2024-web-production-bay-write-up/",
+        "description": "Some powerful proxy protects our cat factory production bay, but the strange thing is that we edited some Nginx config in the platform to protect our `/flag` route, and things do not look as secure as expected.",
+        "solve": "The challenge presents a website that generates cat images via an API. By analyzing the source code, we find that the endpoint for the cat factory is located at:\n\n```\n/api/data/cat\n```\n\nFinding Vulnerability\nFuzzing different parameters, we noticed a strange response when accessing `/api/data`, which suggests adding a `?host=xxx` parameter.\n\nWhen passing our own host, we observed remote connections from the Flask app, revealing headers such as:\n- `X-Real-Ip`\n- `X-Forwarded-For`\n- `X-Original-Host`\n\nAfter testing various approaches, including redirecting to `/flag` from our own server, we found an interesting behavior. By attempting:\n\n```\n/api/data/cat../../../flag\n```\n\nWe discovered that the Flask app behind Nginx could be accessed without being denied.\n\nBypassing Nginx Protection\nHowever, an error occurred because we weren’t accessing it from `localhost:5000`. Remembering the headers we retrieved earlier, we tried spoofing the `X-Original-Host` header and successfully accessed the flag:\n\n```bash\ncurl -vvv http://34.159.76.217:32222//api/flag -H 'X-Original-Host: localhost'\n```\n\nResponse:\n```json\n{\n    \"flag\":\"ctf{89b52b00fd39c0410372b898632e6bf0648ae9f43d500762d03af9e7768bcbfd}\",\n    \"request.host\":\"localhost:5000\"\n}\n```\n\nThe final flag was:\n\n```\nctf{89b52b00fd39c0410372b898632e6bf0648ae9f43d500762d03af9e7768bcbfd}\n```",
+        "tools": "Burp Suite, cURL, Nginx Header Manipulation",
+        "tags": ["Web", "Nginx", "Header Injection", "Path Traversal", "Flask"]
+    }    
 ]
