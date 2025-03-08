@@ -185,7 +185,8 @@
                                                 <summary><strong>Need more help?</strong></summary>
                                             <p><strong>- <a href="https://book.hacktricks.wiki/" target="_blank">Hacktricks Wiki</a> / <a href="https://www.hacktricks.wiki/" target="_blank">Hacktricks Search</a></strong></p>    
                                             <p><strong>- <a href="https://github.com/Adamkadaban/CTFs?tab=readme-ov-file#ctf-cheat-sheet" target="_blank">CTF Cheatsheet by Adamkadaban</a></strong></p>
-                                            <p><strong>- <a href="https://github.com/RajChowdhury240/CTF-CheatSheet?tab=readme-ov-file#ctf-cheatsheet" target="_blank">CTF Cheatsheet by RajChowdhury240</a></strong></p>    
+                                            <p><strong>- <a href="https://github.com/RajChowdhury240/CTF-CheatSheet?tab=readme-ov-file#ctf-cheatsheet" target="_blank">CTF Cheatsheet by RajChowdhury240</a></strong></p>
+                                            <p><strong>- <a href="https://primer.picoctf.com/" target="_blank">PicoCTF Primer</a></strong></p>
                                             </details>
                                         </div>`;
                 container.appendChild(solveElement);
@@ -194,14 +195,13 @@
 
         function filterSolves() {
             const searchValue = document.getElementById('search').value.toLowerCase();
+            const searchTerms = searchValue.split(',').map(term => term.trim()).filter(term => term !== "");
             const checkedTags = Array.from(document.querySelectorAll('.filters input:checked')).map(el => el.value.toLowerCase());
             
             const filteredSolves = solves.filter(solve => {
-                const matchesSearch = solve.name.toLowerCase().includes(searchValue) ||
-                                      solve.description.toLowerCase().includes(searchValue) ||
-                                      solve.tools.toLowerCase().includes(searchValue) ||
-                                      solve.solve.toLowerCase().includes(searchValue);
+                const solveText = `${solve.name} ${solve.description} ${solve.tools} ${solve.solve}`.toLowerCase();
                 
+                const matchesSearch = searchTerms.every(term => solveText.includes(term));
                 const matchesTags = checkedTags.length === 0 || solve.tags.some(tag => checkedTags.includes(tag.toLowerCase()));
                 
                 return matchesSearch && matchesTags;
